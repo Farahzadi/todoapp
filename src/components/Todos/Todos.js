@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import TodoList from '../TodoList'
 import TodoInput from '../TodoInput'
 import TodoFooter from '../TodoFooter'
@@ -38,11 +38,11 @@ function Todos() {
     }
   }
 
-  useEffect(() => {
-    setTodos(initialFilter)
-    setActiveFilter(initialFilter)
-    didMount = 1
-  }, [])
+  if(didMount){
+  setTodos(initialFilter)
+  setActiveFilter(initialFilter)
+  didMount = 1
+  }
 
   // event handling
   const handleEnterText = text => {
