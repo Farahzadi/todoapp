@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import TodoList from '../TodoList'
 import TodoInput from '../TodoInput'
 import TodoFooter from '../TodoFooter'
@@ -19,13 +19,18 @@ import {
   saveTodos
 } from '../../api/localStorage'
 
-let todos = fetchTodos()
-const initialFilter = fetchFilter()
-let didMount = 0
 
 function Todos() {
+
+  let todos
+  let initialFilter
+  todos = todos || fetchTodos()
+  initialFilter = initialFilter || fetchFilter()
+
   const [activeFilter, setActiveFilter] = useState(null)
   const [visibleTodos, setVisibleTodos] = useState([])
+
+  const didMount  = useRef(false);
 
   const setTodos = filter => {
     saveTodos(todos)
@@ -41,7 +46,7 @@ function Todos() {
   useEffect(() => {
     setTodos(initialFilter)
     setActiveFilter(initialFilter)
-    didMount = 1
+    didMount.current = true;
   }, [])
 
   // event handling
@@ -82,7 +87,7 @@ function Todos() {
       />
       <TodoFooter
         activeFilter={activeFilter}
-        doneTodoCount={didMount && getActiveTodos(todos).length}
+        doneTodoCount={didMount.current && getActiveTodos(todos).length}
         onFilterClick={handleFilterClick}
         onClearCompletesClick={handleClearCompletes}
       />
