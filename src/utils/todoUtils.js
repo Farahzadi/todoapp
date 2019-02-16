@@ -24,6 +24,10 @@ export function addTodo(todos: Todos, todoText: string): Todos {
     throw new Error('todos should be an array')
   }
   const newTodo = { id: uuidv4(), text: todoText, done: false }
+  if(getTodoIndexByProperty(todos,'text', todoText) > -1){
+    alert('duplicate task!!');
+    return todos;
+  }
   return todos.concat(newTodo)
 }
 
@@ -44,6 +48,17 @@ export function getTodoIndexById(todos: Todos, id: string) {
     }
   }
   return index
+}
+
+export function getTodoIndexByProperty(todos: Todos, property: string, value: any): number {
+    let index = -1
+    for (let i = 0; i < todos.length; i++) {
+        if (todos[i][property] === value) {
+            index = i
+            break
+        }
+    }
+    return index
 }
 
 export function changeTodoTextById(todos: Todos, id: string, text: string) {

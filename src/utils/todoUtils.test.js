@@ -7,7 +7,8 @@ import {
   getActiveTodos,
   getTodoIndexById,
   changeTodoTextById,
-  changeTodoStatusById
+  changeTodoStatusById,
+  getTodoIndexByProperty
 } from './todoUtils'
 
 test('remove existing todo from todos list successfully', () => {
@@ -53,6 +54,12 @@ test('add todo successfully', () => {
   })
 })
 
+test('add todo duplicate ignore', () => {
+    window.alert = jest.fn();
+    const newTodos = addTodo(todos, 'third todos')
+    expect(newTodos.length).toBe(todos.length)
+})
+
 test('throw error if todos is not array', () => {
   expect(() => {
     addTodo(null, 'some text')
@@ -80,6 +87,14 @@ test('get todo index of existing id', () => {
 
 test('get -1 for todo index of non existing id', () => {
   expect(getTodoIndexById(todos, '223')).toBe(-1)
+})
+
+test('get index of non existing id', () => {
+    expect(getTodoIndexByProperty(todos,'text', 'second todos')).toBe(1)
+})
+
+test('get -1 for todo index of non existing id', () => {
+    expect(getTodoIndexByProperty(todos, 'text', '223')).toBe(-1)
 })
 
 test('change todo text of existing id', () => {
