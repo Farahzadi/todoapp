@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import TodoList from '../TodoList'
 import TodoInput from '../TodoInput'
 import TodoFooter from '../TodoFooter'
@@ -19,46 +19,47 @@ import {
   saveTodos
 } from '../../api/localStorage'
 
-let todos = fetchTodos()
-const initialFilter = fetchFilter()
-let didMount = 0
-
 function Todos() {
   const [activeFilter, setActiveFilter] = useState(null)
   const [visibleTodos, setVisibleTodos] = useState([])
 
+  const todos = useRef(fetchTodos())
+  const initialFilter = useRef(fetchFilter())
+  const didMount = useRef(0)
+
   const setTodos = filter => {
-    saveTodos(todos)
+    const currentTodos = todos.current || []
+    saveTodos(currentTodos)
     if (filter === 'Active') {
-      setVisibleTodos(getActiveTodos(todos))
+      setVisibleTodos(getActiveTodos(currentTodos))
     } else if (filter === 'Completed') {
-      setVisibleTodos(getDoneTodos(todos))
+      setVisibleTodos(getDoneTodos(currentTodos))
     } else {
-      setVisibleTodos(todos)
+      setVisibleTodos(currentTodos)
     }
   }
 
   useEffect(() => {
-    setTodos(initialFilter)
-    setActiveFilter(initialFilter)
-    didMount = 1
+    setTodos(initialFilter.current)
+    setActiveFilter(initialFilter.current)
+    didMount.current = 1
   }, [])
 
   // event handling
   const handleEnterText = text => {
-    todos = addTodo(todos, text)
+    todos.current = addTodo(todos.current || [], text)
     setTodos(activeFilter)
   }
   const handleItemRemove = id => {
-    todos = removeTodoById(todos, id)
+    todos.current = removeTodoById(todos.current || [], id)
     setTodos(activeFilter)
   }
   const handleChangeItemText = (id, text) => {
-    todos = changeTodoTextById(todos, id, text)
+    todos.current = changeTodoTextById(todos.current || [], id, text)
     setTodos(activeFilter)
   }
   const handleChangeItemStatus = (id, status) => {
-    todos = changeTodoStatusById(todos, id, status)
+    todos.current = changeTodoStatusById(todos.current || [], id, status)
     setTodos(activeFilter)
   }
   const handleFilterClick = filter => {
@@ -67,7 +68,7 @@ function Todos() {
     saveFilter(filter)
   }
   const handleClearCompletes = () => {
-    todos = getActiveTodos(todos)
+    todos.current = getActiveTodos(todos.current || [])
     setTodos()
   }
 
@@ -82,7 +83,7 @@ function Todos() {
       />
       <TodoFooter
         activeFilter={activeFilter}
-        doneTodoCount={didMount && getActiveTodos(todos).length}
+        doneTodoCount={didMount.current && getActiveTodos(todos.current || []).length}
         onFilterClick={handleFilterClick}
         onClearCompletesClick={handleClearCompletes}
       />
